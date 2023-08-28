@@ -1,9 +1,22 @@
 import { useSession } from "next-auth/react";
 import { signOut, signIn } from "next-auth/react";
 import React from "react";
+import { api } from "~/utils/api";
 
 const Header = () => {
   const { data: userData, status } = useSession();
+  const { data: self, isLoading } = api.user.self.useQuery();
+  const { mutateAsync: genUrl } = api.youtube.genUrl.useMutation();
+
+  const handleGetYoutubeAccess = async () => {
+    try {
+      const url = await genUrl();
+      window.open(url, "_blank");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  if (isLoading) return <div>Loading...</div>;
   return (
     <div className="flex flex-row justify-between bg-red-500 px-5 py-3">
       <h1 className="ml-3 text-2xl font-bold text-white">Youtub uploader</h1>
@@ -26,14 +39,24 @@ const Header = () => {
           >
             Logout
           </button>
+          {self?.yt_expiry_date < Date.now() && (
+            <button
+              className="rounded-md bg-white px-3 py-1 text-black"
+              onClick={() => void handleGetYoutubeAccess()}
+            >
+              Refresh Token
+            </button>
+          )}
         </div>
       ) : (
-        <button
-          className="rounded-md bg-white px-3 py-1 text-black"
-          onClick={() => void signIn()}
-        >
-          Login
-        </button>
+        <>
+          <button
+            className="rounded-md bg-white px-3 py-1 text-black"
+            onClick={() => void signIn()}
+          >
+            Login
+          </button>
+        </>
       )}
     </div>
   );
