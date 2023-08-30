@@ -13,8 +13,8 @@ const MyApp: AppType<{ session: Session | null }> = ({
   return (
     <SessionProvider session={session}>
       <Header />
-      <div className="flex flex-row ">
-        <div className="flex h-screen w-2/12 flex-col  bg-gray-200 px-5 pt-5">
+      <div className="flex flex-row">
+        <div className="flex min-h-screen w-2/12 flex-col  bg-gray-200 px-5 pt-5">
           <Link href="/" className="p-3 hover:bg-gray-300">
             Home
           </Link>

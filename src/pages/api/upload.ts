@@ -33,13 +33,14 @@ export default async function handler(
           description: fields?.description[0]!,
         },
         status: {
-          privacyStatus: "unlisted",
+          privacyStatus: "public",
         },
       },
       media: {
         body: fs.createReadStream(files.file[0].filepath),
       },
     });
+    console.log(response);
     return res.status(200).json(response.data);
   } catch (err) {
     if (err) {

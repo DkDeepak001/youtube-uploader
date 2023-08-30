@@ -17,38 +17,47 @@ export const youtubeRouter = createTRPCRouter({
       state: `${ctx.session?.user.id}`,
     });
   }),
-  getChannel: protectedProcedure.mutation(async ({ ctx }) => {
-    const user = await ctx.prisma.user.findUnique({
-      where: {
-        id: ctx?.session?.user.id,
-      },
-    });
-    oAuth2Client.setCredentials({
-      access_token: user?.yt_access_token,
-      refresh_token: user?.yt_refresh_token,
-      expiry_date: user?.yt_expiry_date,
-    });
-    const videos = await youtube.videos.list({
-      part: ["snippet", "contentDetails", "status", "statistics"],
-      myRating: "like",
-    });
-    const channels = await youtube.channels.list({
-      part: [
-        "snippet",
-        "contentDetails",
-        "statistics",
-        "status",
-        "brandingSettings",
-        "topicDetails",
-        "localizations",
-        "contentOwnerDetails",
-        "id",
-      ],
-      mine: true,
-    });
-    return {
-      videos: videos.data.items,
-      channels: channels.data.items,
-    };
+  getChannel: protectedProcedure.query(async ({ ctx }) => {
+    try {
+      const user = await ctx.prisma.user.findUnique({
+        where: {
+          id: ctx?.session?.user.id,
+        },
+      });
+      oAuth2Client.setCredentials({
+        access_token: user?.yt_access_token,
+        refresh_token: user?.yt_refresh_token,
+        expiry_date: user?.yt_expiry_date,
+      });
+      const channels = await youtube.channels.list({
+        part: [
+          "snippet",
+          "contentDetails",
+          "statistics",
+          "status",
+          "brandingSettings",
+          "topicDetails",
+          "localizations",
+          "contentOwnerDetails",
+          "id",
+        ],
+        mine: true,
+      });
+
+      const videos = await youtube.search.list({
+        part: ["snippet"],
+        forMine: true,
+        type: ["video"],
+        maxResults: 20,
+      });
+      console.log(videos.data.items);
+
+      return {
+        channels: channels.data.items,
+        videos: videos.data.items,
+      };
+    } catch (err) {
+      console.error(err);
+    }
   }),
 });

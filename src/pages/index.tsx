@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { InputText } from "primereact/inputtext";
+import ChannelDetail from "~/components/channelDetail";
+import { useSession } from "next-auth/react";
 
 export default function Home() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-
+  const { data: userData } = useSession();
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event?.target?.files && event?.target?.files[0];
     if (file) {
@@ -21,7 +23,7 @@ export default function Home() {
       formData.append("description", description);
 
       await fetch(
-        "http://localhost:3000/api/upload?userid=64eab8023b78d0051b33578c",
+        `http://localhost:3000/api/upload?userid=${userData?.user.id}`,
         {
           method: "POST",
           body: formData,
@@ -31,6 +33,7 @@ export default function Home() {
   };
   return (
     <>
+      <ChannelDetail />
       <div className="flex  flex-col items-center justify-center gap-y-3 py-2">
         <InputText
           type="text"
