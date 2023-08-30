@@ -1,6 +1,7 @@
 import { youtubeRouter } from "~/server/api/routers/youtube";
 import { createTRPCRouter } from "~/server/api/trpc";
 import { userRouter } from "./routers/user";
+import { uploadRouter } from "./routers/upload";
 
 /**
  * This is the primary router for your server.
@@ -10,6 +11,7 @@ import { userRouter } from "./routers/user";
 export const appRouter = createTRPCRouter({
   youtube: youtubeRouter,
   user: userRouter,
+  upload: uploadRouter,
 });
 
 // export type definition of API

@@ -7,8 +7,14 @@ new S3rver({
   directory: "./s3",
   configureBuckets: [
     {
-      name: "upload-videos",
+      name: "upload-videos.localhost",
       configs: [fs.readFileSync("./cors.xml")],
     },
   ],
-}).run();
+}).run((err, { address, port } = {}) => {
+  if (err) {
+    console.error(err);
+  } else {
+    console.log("now listening at address %s and port %d", address, port);
+  }
+});

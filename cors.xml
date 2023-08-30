@@ -4,7 +4,6 @@
         <AllowedOrigin>*</AllowedOrigin>
         <AllowedMethod>POST</AllowedMethod>
         <AllowedMethod>GET</AllowedMethod>
-        <MaxAgeSeconds>3000</MaxAgeSeconds>
-        <AllowedHeader>Authorization</AllowedHeader>
+        <AllowedMethod>PUT</AllowedMethod>
     </CORSRule>
 </CORSConfiguration>
