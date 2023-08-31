@@ -38,4 +38,86 @@ export const userRouter = createTRPCRouter({
       });
       return (await editors).filter((editor) => editor.role === "EDITOR");
     }),
+
+  addEditor: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      try {
+        return await ctx.prisma.$transaction([
+          ctx.prisma.user.update({
+            where: {
+              id: input.id,
+            },
+            data: {
+              edittingChannels: {
+                set: [ctx?.session?.user.id],
+              },
+            },
+          }),
+          ctx.prisma.editors.create({
+            data: {
+              ownerIds: {
+                set: [ctx.session.user.id],
+              },
+              editorsIDs: {
+                set: [input.id],
+              },
+            },
+          }),
+          ctx.prisma.user.update({
+            where: {
+              id: ctx?.session?.user.id,
+            },
+            data: {
+              editorsIDs: {
+                set: [input.id],
+              },
+            },
+          }),
+        ]);
+      } catch (err) {
+        console.log(err);
+        return null;
+      }
+    }),
+  removeEditor: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      try {
+        return await ctx.prisma.$transaction([
+          ctx.prisma.user.update({
+            where: {
+              id: input.id,
+            },
+            data: {
+              edittingChannels: {
+                set: [],
+              },
+            },
+          }),
+
+          ctx.prisma.user.update({
+            where: {
+              id: ctx?.session?.user.id,
+            },
+            data: {
+              editorsIDs: {
+                set: [],
+              },
+            },
+          }),
+        ]);
+      } catch (err) {
+        console.log(err);
+        return null;
+      }
+    }),
 });
