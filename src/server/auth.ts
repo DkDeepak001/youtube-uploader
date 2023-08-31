@@ -5,14 +5,10 @@ import {
   type NextAuthOptions,
   type DefaultSession,
 } from "next-auth";
-import DiscordProvider from "next-auth/providers/discord";
 import GoogleProvider from "next-auth/providers/google";
 import { env } from "~/env.mjs";
 import { prisma } from "~/server/db";
-const SCOPES = [
-  "https://www.googleapis.com/auth/youtube.upload",
-  "https://www.googleapis.com/auth/youtube",
-];
+
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`

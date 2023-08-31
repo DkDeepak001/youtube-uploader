@@ -1,12 +1,14 @@
 import { useSession } from "next-auth/react";
 import { signOut, signIn } from "next-auth/react";
-import React from "react";
+import React, { useState } from "react";
+import toast from "react-hot-toast";
 import { api } from "~/utils/api";
 
 const Header = () => {
   const { data: userData, status } = useSession();
   const { data: self, isLoading } = api.user.self.useQuery();
   const { mutateAsync: genUrl } = api.youtube.genUrl.useMutation();
+  const [firstTime, setFirstTime] = useState<boolean>(true);
 
   const handleGetYoutubeAccess = async () => {
     try {
@@ -16,12 +18,52 @@ const Header = () => {
       console.log(error);
     }
   };
-  if (isLoading) return <div>Loading...</div>;
+  const handleSwtichRoleAlert = async () => {
+    if (self?.role === "EDITOR" && firstTime) {
+      setFirstTime(false);
+      toast.custom((t) => (
+        <div className="z-30 flex flex-col items-center justify-between rounded-lg bg-white p-5 shadow-lg">
+          <p>Are you sure you want to switch to Editor?</p>
+          <div className="flex flex-row gap-x-2">
+            <button
+              className="rounded-md bg-green-400 px-3 py-1 text-white"
+              onClick={() => {
+                void toast.dismiss(t.id);
+                void handleGetYoutubeAccess();
+              }}
+            >
+              Yes
+            </button>
+            <button
+              className="rounded-md bg-red-400 px-3 py-1 text-white"
+              onClick={() => {
+                void toast.dismiss(t.id);
+                setFirstTime(true);
+              }}
+            >
+              No
+            </button>
+          </div>
+        </div>
+      ));
+    } else {
+      setFirstTime(false);
+      await handleGetYoutubeAccess();
+    }
+  };
+  if (isLoading)
+    return (
+      <div className="flex flex-row justify-between bg-red-500 px-5 py-3">
+        <h1 className="ml-3 text-2xl font-bold text-white">Youtub uploader</h1>
+        <div> Loading...</div>
+      </div>
+    );
   return (
     <div className="flex flex-row justify-between bg-red-500 px-5 py-3">
       <h1 className="ml-3 text-2xl font-bold text-white">Youtub uploader</h1>
       {status === "authenticated" ? (
         <div className="flex flex-row items-center justify-center gap-x-5">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             alt="Profile picture"
             src={userData?.user?.image!}
@@ -42,9 +84,9 @@ const Header = () => {
           {self?.yt_expiry_date < Date.now() && (
             <button
               className="rounded-md bg-white px-3 py-1 text-black"
-              onClick={() => void handleGetYoutubeAccess()}
+              onClick={() => void handleSwtichRoleAlert()}
             >
-              Refresh Token
+              {self?.role === "EDITOR" ? "Swtich Role" : "Get Access"}
             </button>
           )}
         </div>
@@ -52,7 +94,7 @@ const Header = () => {
         <>
           <button
             className="rounded-md bg-white px-3 py-1 text-black"
-            onClick={() => void signIn()}
+            onClick={() => void signIn("google")}
           >
             Login
           </button>

@@ -17,6 +17,7 @@ export default async function handler(
       id: userID as string,
     },
     data: {
+      role: "OWNER",
       yt_access_token: tokens.access_token,
       yt_expiry_date: tokens.expiry_date,
       yt_refresh_token: tokens.refresh_token,

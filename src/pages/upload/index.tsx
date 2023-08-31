@@ -6,6 +6,7 @@ const Upload = () => {
   const { mutateAsync: getUrl } = api.upload.createPresignedUrl.useMutation();
 
   const handleGetUrl = async () => {
+    if (!selectedFile) alert("Please select a file");
     try {
       console.log("handleGetUrl");
       const data = await getUrl();
@@ -35,7 +36,7 @@ const Upload = () => {
     <div>
       Upload
       <input type="file" onChange={handleFileChange} />
-      <button onClick={handleGetUrl}>Get Url</button>
+      <button onClick={() => void handleGetUrl()}>Get Url</button>
     </div>
   );
 };

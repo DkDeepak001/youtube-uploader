@@ -1,71 +1,92 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["filteredRelationCount", "fullTextSearch", "fullTextIndex"]
 }
 
 datasource db {
   provider = "mongodb"
   url      = env("DATABASE_URL")
+  
 }
-// Necessary for Next auth
-model Account {
-  id     String @id @default(auto()) @map("_id") @db.ObjectId
-    userId            String
-    type              String
-    provider          String
-    providerAccountId String
-    refresh_token     String? // @db.Text
-    access_token      String? // @db.Text
-    expires_at        Int?
-    token_type        String?
-    scope             String?
-    id_token          String? // @db.Text
-    session_state     String?
-    user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    @@unique([provider, providerAccountId])
+model Account {
+  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? // @db.Text
+  access_token      String? // @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? // @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
 }
 
 model Session {
-    id     String @id @default(auto()) @map("_id") @db.ObjectId
-    sessionToken String   @unique
-    userId       String
-    expires      DateTime
-    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum Role {
+  EDITOR
+  OWNER
 }
 
 model User {
-    id     String @id @default(auto()) @map("_id") @db.ObjectId
-    name          String?
-    email         String?   @unique
-    emailVerified DateTime?
-    image         String?
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    channelIDs String[] @db.ObjectId
-    channel   Channel[]   @relation(fields: [channelIDs], references: [id])
-    accounts      Account[]
-    sessions      Session[]
-    yt_access_token String?
-    yt_refresh_token String?
-    yt_expiry_date Int?
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+
+  role Role @default(EDITOR)
+
+  yt_access_token  String?
+  yt_refresh_token String?
+  yt_expiry_date   Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  channelIDs String[]  @db.ObjectId
+  channel    Channel[] @relation(fields: [channelIDs], references: [id])
+  accounts   Account[]
+  sessions   Session[]
+
+  editorsIDs String[]  @db.ObjectId
+  editors    Editors[] @relation(fields: [editorsIDs], references: [id])
+
+  @@index([name, email])
 }
 
 model VerificationToken {
-    id     String @id @default(auto()) @map("_id") @db.ObjectId
-    token      String   @unique
-    expires    DateTime
-
+  id      String   @id @default(auto()) @map("_id") @db.ObjectId
+  token   String   @unique
+  expires DateTime
 }
 
 model Channel {
-    id     String @id @default(auto()) @map("_id") @db.ObjectId
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    name      String
-    userIDs String[]   @db.ObjectId
-    user  User[] @relation(fields: [userIDs], references: [id])
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  name      String
+  userIDs   String[] @db.ObjectId
+  user      User[]   @relation(fields: [userIDs], references: [id])
 }
 
+model Editors {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  name      String
+  userIDs   String[] @db.ObjectId
+  user      User[]   @relation(fields: [userIDs], references: [id])
+}

@@ -1,8 +1,9 @@
 import { api } from "~/utils/api";
 
 export default function ChannelDetail() {
-  const { data: channelData } = api.youtube.getChannel.useQuery();
-  console.log(channelData);
+  const { data: channelData, isLoading } = api.youtube.getChannel.useQuery();
+  if (isLoading) return <div>Loading...</div>;
+
   return (
     <div className="flex flex-col gap-y-3">
       <div className="flex flex-row items-center  gap-x-3 py-2">
