@@ -2,8 +2,9 @@
 <CORSConfiguration>
     <CORSRule>
         <AllowedOrigin>*</AllowedOrigin>
-        <AllowedMethod>POST</AllowedMethod>
-        <AllowedMethod>GET</AllowedMethod>
         <AllowedMethod>PUT</AllowedMethod>
+        <AllowedHeader>*</AllowedHeader>
+        <AllowedHeader>Content-Type</AllowedHeader>
     </CORSRule>
 </CORSConfiguration>
+

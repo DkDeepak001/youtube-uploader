@@ -7,10 +7,11 @@ export const uploadRouter = createTRPCRouter({
     try {
       const url = s3Client.getSignedUrl("putObject", {
         Bucket: "upload-videos.localhost",
-        Key: `kasjdajsdk`,
+        Key: `videos2`,
         Expires: 60 * 60 * 24,
-        ContentType: "image/png",
+        ContentType: "video/mp4",
       });
+
       return { url };
     } catch (err) {
       console.error(err);

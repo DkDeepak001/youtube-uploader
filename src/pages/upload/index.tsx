@@ -13,17 +13,14 @@ const Upload = () => {
       console.log(data);
       if (!data?.url) return;
 
-      // const formData = new FormData();
-      // formData.append("file", selectedFile);
-
-      // const resp = await fetch(data.url, {
-      //   method: "PUT",
-      //   body: selectedFile,
-      //   headers: {
-      //     "Content-Type": `image/png`,
-      //   },
-      // });
-      // console.log(resp);
+      const resp = await fetch(data.url, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "video/mp4",
+        },
+        body: selectedFile,
+      });
+      console.log(resp);
     } catch (error) {
       console.log(error);
     }
