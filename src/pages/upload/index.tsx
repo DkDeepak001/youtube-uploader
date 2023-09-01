@@ -12,6 +12,8 @@ const Upload = () => {
   const { mutateAsync: getUrl } = api.upload.createPresignedUrl.useMutation();
   const { mutateAsync: createVideo } = api.upload.createVideo.useMutation();
 
+  const { data: videoQueue } = api.upload.getVideoQueue.useQuery();
+
   const handleGetUrl = async () => {
     console.log(selectedEditor);
     if (!selectedFile) return toast.error("Please select a file");
@@ -72,6 +74,41 @@ const Upload = () => {
           Upload new video
         </button>
       </div>
+
+      <table className="my-3 w-full table-auto p-2">
+        <thead className="border-b-2 border-gray-400">
+          <tr className="bg-slate-400 p-2 text-left">
+            <th className="p-3">Id</th>
+            <th className="p-3">Editor</th>
+            <th className="p-3">Status</th>
+            <th className="p-3">DueDate</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-gray-400 bg-gray-100 text-sm text-gray-700">
+          {videoQueue?.length === 0 ? (
+            <div className="w-full bg-white  p-5">No Vidoes </div>
+          ) : (
+            videoQueue?.map((video, index) => (
+              <tr key={video.id} className="hover:bg-gray-200">
+                <td className="p-2">{index + 1}</td>
+                {/* <td className="p-2">
+                <img
+                  src={video.editor.image}
+                  alt="profile"
+                  className="h-10 w-10 rounded-full"
+                />
+              </td> */}
+                <td className="p-2">{video.editor.name}</td>
+                <td className="p-2">{video.status}</td>
+                <td className="p-2">
+                  {new Date(video.dueDate).toLocaleDateString()}
+                </td>
+              </tr>
+            ))
+          )}
+        </tbody>
+      </table>
+
       {showpopup && (
         <div className="fixed inset-0 z-10 overflow-y-auto">
           <div className="z-20 flex min-h-screen flex-col items-center justify-center ">

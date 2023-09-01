@@ -28,7 +28,27 @@ export const uploadRouter = createTRPCRouter({
         console.error(err);
       }
     }),
-
+  getVideoQueue: protectedProcedure.query(async ({ ctx }) => {
+    return await ctx.prisma.videoQueue.findMany({
+      where: {
+        ownerId: ctx.session.user.id,
+      },
+      select: {
+        id: true,
+        status: true,
+        videoUrl: true,
+        dueDate: true,
+        editorId: true,
+        editor: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+  }),
   createVideo: protectedProcedure
     .input(
       z.object({
