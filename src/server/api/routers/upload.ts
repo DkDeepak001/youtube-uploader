@@ -9,16 +9,21 @@ export const uploadRouter = createTRPCRouter({
       z.object({
         fileName: z.string(),
         fileType: z.string(),
+        type: z.enum(["owner", "editor"]),
+        oldFilePath: z.string().optional(),
       })
     )
     .mutation(({ ctx, input }) => {
       try {
         const extention = input.fileName.split(".")[1];
+        const key =
+          input.type === "owner"
+            ? `${ctx.session.user.id}/${uuidv4()}.${extention}`
+            : input.oldFilePath;
+
         const url = s3Client.getSignedUrl("putObject", {
           Bucket: "upload-videos.localhost",
-          Key: `${ctx.session.user.id}/${
-            input.fileName.split(".")[0]
-          }/${uuidv4()}.${extention}}`,
+          Key: key,
           Expires: 60 * 60 * 24,
           ContentType: `${input.fileType}`,
         });
@@ -39,6 +44,11 @@ export const uploadRouter = createTRPCRouter({
         videoUrl: true,
         dueDate: true,
         editorId: true,
+        _count: {
+          select: {
+            rework: true,
+          },
+        },
         editor: {
           select: {
             id: true,
@@ -49,6 +59,66 @@ export const uploadRouter = createTRPCRouter({
       },
     });
   }),
+  videosToEdit: protectedProcedure.query(async ({ ctx }) => {
+    return await ctx.prisma.videoQueue.findMany({
+      where: {
+        editor: {
+          id: ctx.session.user.id,
+        },
+      },
+      select: {
+        id: true,
+        status: true,
+        videoUrl: true,
+        dueDate: true,
+        ownerId: true,
+        rework: {
+          orderBy: {
+            createdAt: "desc",
+          },
+          take: 1,
+          select: {
+            videoUrl: true,
+          },
+        },
+      },
+    });
+  }),
+  getQueueStatus: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      return await ctx.prisma.videoQueue.findUnique({
+        where: {
+          id: input.id,
+        },
+        select: {
+          rework: {
+            select: {
+              id: true,
+              videoUrl: true,
+              createdAt: true,
+            },
+          },
+          status: true,
+          editor: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              image: true,
+            },
+          },
+          dueDate: true,
+          createdAt: true,
+          videoUrl: true,
+        },
+      });
+    }),
+
   createVideo: protectedProcedure
     .input(
       z.object({
@@ -65,6 +135,33 @@ export const uploadRouter = createTRPCRouter({
           editorId: input.editorId,
           videoUrl: input.videoUrl,
           dueDate: new Date(input.dueDate),
+          rework: {
+            create: {
+              videoUrl: input.videoUrl,
+            },
+          },
+        },
+      });
+    }),
+  videoEdited: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        videoUrl: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      return await ctx.prisma.videoQueue.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          status: "READY",
+          rework: {
+            create: {
+              videoUrl: input.videoUrl,
+            },
+          },
         },
       });
     }),

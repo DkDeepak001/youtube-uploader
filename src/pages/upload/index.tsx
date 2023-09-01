@@ -1,9 +1,11 @@
+import { useRouter } from "next/router";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { api } from "~/utils/api";
 
 const Upload = () => {
   const context = api.useContext();
+  const router = useRouter();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [selectedEditor, setSelectedEditor] = useState<string>("");
   const [selectedDate, setSelectedDate] = useState<string>("");
@@ -14,13 +16,12 @@ const Upload = () => {
   const { mutateAsync: createVideo } = api.upload.createVideo.useMutation({
     onSuccess: async () => {
       await context.upload.getVideoQueue.invalidate();
-    }
+    },
   });
 
   const { data: videoQueue } = api.upload.getVideoQueue.useQuery();
 
   const handleGetUrl = async () => {
-    console.log(selectedEditor);
     if (!selectedFile) return toast.error("Please select a file");
     if (selectedEditor === "") return toast.error("Please select an editor");
     if (selectedEditor.length === 0)
@@ -29,10 +30,10 @@ const Upload = () => {
     if (selectedDate === new Date().toISOString().split("T")[0])
       return toast.error("Please select a date");
     try {
-      console.log(selectedFile);
       const data = await getUrl({
         fileName: selectedFile.name,
         fileType: selectedFile.type,
+        type: "owner",
       });
       if (!data?.url) return;
 
@@ -87,6 +88,7 @@ const Upload = () => {
             <th className="p-3">Editor</th>
             <th className="p-3">Status</th>
             <th className="p-3">DueDate</th>
+            <th className="p-3">Reworks</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-400 bg-gray-100 text-sm text-gray-700">
@@ -94,7 +96,11 @@ const Upload = () => {
             <div className="w-full bg-white  p-5">No Vidoes </div>
           ) : (
             videoQueue?.map((video, index) => (
-              <tr key={video.id} className="hover:bg-gray-200">
+              <tr
+                key={video.id}
+                className="cursor-pointer hover:bg-gray-200"
+                onClick={() => void router.push(`/upload/${video.id}`)}
+              >
                 <td className="p-2">{index + 1}</td>
                 {/* <td className="p-2">
                 <img
@@ -108,6 +114,7 @@ const Upload = () => {
                 <td className="p-2">
                   {new Date(video.dueDate).toLocaleDateString()}
                 </td>
+                <td className="p-2">{video._count?.rework} Reworked</td>
               </tr>
             ))
           )}

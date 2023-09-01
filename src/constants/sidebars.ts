@@ -5,7 +5,7 @@ export const EditorSideBar = [
   },
   {
     name: "Videos",
-    link: "/upload",
+    link: "/videos",
   },
 ];
 
