@@ -3,6 +3,7 @@ import toast from "react-hot-toast";
 import { api } from "~/utils/api";
 
 const Upload = () => {
+  const context = api.useContext();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [selectedEditor, setSelectedEditor] = useState<string>("");
   const [selectedDate, setSelectedDate] = useState<string>("");
@@ -10,7 +11,11 @@ const Upload = () => {
 
   const { data: editors } = api.user.getEditors.useQuery();
   const { mutateAsync: getUrl } = api.upload.createPresignedUrl.useMutation();
-  const { mutateAsync: createVideo } = api.upload.createVideo.useMutation();
+  const { mutateAsync: createVideo } = api.upload.createVideo.useMutation({
+    onSuccess: async () => {
+      await context.upload.getVideoQueue.invalidate();
+    }
+  });
 
   const { data: videoQueue } = api.upload.getVideoQueue.useQuery();
 
