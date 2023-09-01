@@ -11,7 +11,7 @@ datasource db {
 
 model Account {
   id                String  @id @default(auto()) @map("_id") @db.ObjectId
-  userId            String
+  userId            String @db.ObjectId
   type              String
   provider          String
   providerAccountId String
@@ -30,7 +30,7 @@ model Account {
 model Session {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
   sessionToken String   @unique
-  userId       String
+  userId       String @db.ObjectId
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
@@ -60,6 +60,7 @@ model User {
   channel    Channel[] @relation(fields: [channelIDs], references: [id])
   accounts   Account[]
   sessions   Session[]
+  videos     VideoQueue[]
 
 
   edittingChannels String[]  @db.ObjectId
@@ -96,4 +97,43 @@ model Editors {
 
   editorsIDs   String[] @db.ObjectId
   editors      User[]   @relation(name:"editors",fields: [editorsIDs], references: [id])
+}
+
+enum VideoStatus {
+  EDITING
+  READY
+  PUBLISHED
+}
+
+model VideoQueue {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  ownerId  String 
+  editorId  String @db.ObjectId
+  editor    User    @relation(fields: [editorId], references: [id])
+  status    VideoStatus @default(EDITING)
+
+  videoUrl  String 
+
+
+  dueDate   DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  rework   QueueLog[] 
+
+  @@index([ownerId, editorId])
+}
+
+
+model QueueLog{
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  videoUrl  String
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+
+  videoId   String @db.ObjectId
+  video     VideoQueue @relation(fields: [videoId], references: [id])
+
 }

@@ -13,6 +13,33 @@ export const userRouter = createTRPCRouter({
       },
     });
   }),
+
+  getEditors: protectedProcedure.query(async ({ ctx }) => {
+    const editorsIDs = await ctx.prisma.user.findUnique({
+      where: {
+        id: ctx?.session?.user.id,
+      },
+      select: {
+        editorsIDs: true,
+      },
+    });
+    if (!editorsIDs) return null;
+    const editors = await ctx.prisma.user.findMany({
+      where: {
+        id: {
+          in: editorsIDs.editorsIDs,
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        image: true,
+      },
+    });
+    return editors;
+  }),
   searchEditors: protectedProcedure
     .input(
       z.object({
