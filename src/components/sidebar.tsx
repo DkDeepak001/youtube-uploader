@@ -9,13 +9,9 @@ const Sidebar = () => {
 
   const sideBar = self?.role === "OWNER" ? OwnerSideBar : EditorSideBar;
   return (
-    <div className="flex min-h-screen w-2/12 flex-col  bg-gray-200 px-5 pt-5">
+    <div className="flex min-h-screen w-2/12 flex-col border-r-[1px] bg-foreground px-5 pt-5">
       {sideBar.map((item) => (
-        <Link
-          href={item.link}
-          key={item.name}
-          className="p-3 hover:bg-gray-300"
-        >
+        <Link href={item.link} key={item.name} className="p-3 text-background">
           {item.name}
         </Link>
       ))}

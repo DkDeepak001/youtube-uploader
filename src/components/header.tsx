@@ -3,6 +3,7 @@ import { signOut, signIn } from "next-auth/react";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { api } from "~/utils/api";
+import { Button } from "./button";
 
 const Header = () => {
   const { data: userData, status } = useSession();
@@ -25,7 +26,7 @@ const Header = () => {
         <div className="z-30 flex flex-col items-center justify-between rounded-lg bg-white p-5 shadow-lg">
           <p>Are you sure you want to switch to Editor?</p>
           <div className="flex flex-row gap-x-2">
-            <button
+            <Button
               className="rounded-md bg-green-400 px-3 py-1 text-white"
               onClick={() => {
                 void toast.dismiss(t.id);
@@ -33,7 +34,7 @@ const Header = () => {
               }}
             >
               Yes
-            </button>
+            </Button>
             <button
               className="rounded-md bg-red-400 px-3 py-1 text-white"
               onClick={() => {
@@ -53,13 +54,13 @@ const Header = () => {
   };
   if (isLoading)
     return (
-      <div className="flex flex-row justify-between bg-red-500 px-5 py-3">
+      <div className="flex flex-row justify-between border-b bg-foreground px-5 py-3">
         <h1 className="ml-3 text-2xl font-bold text-white">Youtub uploader</h1>
         <div> Loading...</div>
       </div>
     );
   return (
-    <div className="flex flex-row justify-between bg-red-500 px-5 py-3">
+    <div className="flex flex-row justify-between border-b bg-foreground px-5 py-3">
       <h1 className="ml-3 text-2xl font-bold text-white">Youtub uploader</h1>
       {status === "authenticated" ? (
         <div className="flex flex-row items-center justify-center gap-x-5">
@@ -75,29 +76,30 @@ const Header = () => {
             <h2 className="font-bold text-white ">{userData?.user?.name}</h2>
             <h3 className="text-sm text-white">{userData?.user?.email}</h3>
           </div>
-          <button
-            className="rounded-md bg-white px-3 py-1 text-black"
+          <Button
+            variant="default"
+            // className="rounded-md bg-white px-3 py-1 text-black"
             onClick={() => void signOut()}
           >
             Logout
-          </button>
+          </Button>
           {self?.yt_expiry_date < Date.now() && (
-            <button
+            <Button
               className="rounded-md bg-white px-3 py-1 text-black"
               onClick={() => void handleSwtichRoleAlert()}
             >
               {self?.role === "EDITOR" ? "Swtich Role" : "Get Access"}
-            </button>
+            </Button>
           )}
         </div>
       ) : (
         <>
-          <button
+          <Button
             className="rounded-md bg-white px-3 py-1 text-black"
             onClick={() => void signIn("google")}
           >
             Login
-          </button>
+          </Button>
         </>
       )}
     </div>

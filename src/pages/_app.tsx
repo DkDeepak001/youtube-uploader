@@ -15,9 +15,9 @@ const MyApp: AppType<{ session: Session | null }> = ({
     <SessionProvider session={session}>
       <Toaster />
       <Header />
-      <div className="flex flex-row">
+      <div className="flex flex-row bg-foreground">
         <Sidebar />
-        <div className="w-10/12 p-5">
+        <div className="w-10/12  p-5">
           <Component {...pageProps} />
         </div>
       </div>
