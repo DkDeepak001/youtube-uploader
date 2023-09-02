@@ -102,13 +102,7 @@ const Upload = () => {
                 onClick={() => void router.push(`/upload/${video.id}`)}
               >
                 <td className="p-2">{index + 1}</td>
-                {/* <td className="p-2">
-                <img
-                  src={video.editor.image}
-                  alt="profile"
-                  className="h-10 w-10 rounded-full"
-                />
-              </td> */}
+
                 <td className="p-2">{video.editor.name}</td>
                 <td className="p-2">{video.status}</td>
                 <td className="p-2">

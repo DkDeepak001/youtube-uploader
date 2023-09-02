@@ -96,6 +96,7 @@ export const uploadRouter = createTRPCRouter({
           id: input.id,
         },
         select: {
+          id: true,
           rework: {
             select: {
               id: true,
@@ -162,6 +163,23 @@ export const uploadRouter = createTRPCRouter({
               videoUrl: input.videoUrl,
             },
           },
+        },
+      });
+    }),
+  changeStatus: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        status: z.enum(["EDITING", "READY", "REWORK", "APPROVED", "PUBLISHED"]),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      return await ctx.prisma.videoQueue.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          status: input.status,
         },
       });
     }),

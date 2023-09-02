@@ -102,7 +102,7 @@ const Videos = () => {
                 ) : (
                   <td className="p-2">Url not found</td>
                 )}
-                {video.status === "EDITING" ? (
+                {video.status === "EDITING" || video.status === "REWORK" ? (
                   <td className="p-2">
                     <input
                       type="file"

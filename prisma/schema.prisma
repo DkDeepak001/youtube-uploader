@@ -101,7 +101,9 @@ model Editors {
 
 enum VideoStatus {
   EDITING
+  REWORK
   READY
+  APPROVED
   PUBLISHED
 }
 
