@@ -1,14 +1,44 @@
 import { useRouter } from "next/router";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { Button } from "~/components/button";
 import { api } from "~/utils/api";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../../components/dialog";
+
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../components/select";
+
+import * as React from "react";
+import { format } from "date-fns";
+import { Calendar as CalendarIcon } from "lucide-react";
+
+import { cn } from "../../utils/cn";
+import { Calendar } from "../../components/calender";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "../../components/popover";
+import { Input } from "~/components/input";
 
 const Upload = () => {
   const context = api.useContext();
   const router = useRouter();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [selectedEditor, setSelectedEditor] = useState<string>("");
-  const [selectedDate, setSelectedDate] = useState<string>("");
+  const [date, setDate] = React.useState<Date>();
   const [showpopup, setShowpopup] = useState<boolean>(false);
 
   const { data: editors } = api.user.getEditors.useQuery();
@@ -26,9 +56,7 @@ const Upload = () => {
     if (selectedEditor === "") return toast.error("Please select an editor");
     if (selectedEditor.length === 0)
       return toast.error("Please select an editor");
-    if (!selectedDate) return toast.error("Please select a date");
-    if (selectedDate === new Date().toISOString().split("T")[0])
-      return toast.error("Please select a date");
+    if (!date) return toast.error("Please select a date");
     try {
       const data = await getUrl({
         fileName: selectedFile.name,
@@ -54,7 +82,7 @@ const Upload = () => {
       if (uploadRes.status !== 200) return toast.error("Failed to upload");
       const videoRes = await createVideo({
         editorId: selectedEditor,
-        dueDate: selectedDate,
+        dueDate: date,
         videoUrl: data.url,
       });
       if (!videoRes?.id) return;
@@ -73,12 +101,59 @@ const Upload = () => {
     <div>
       <div className="flex flex-row items-center justify-between">
         <h2 className="text-2xl font-bold">Editing Vidoes</h2>
-        <button
-          className="ml-2 rounded-md bg-blue-500 px-5 py-2 font-bold text-white"
-          onClick={() => setShowpopup(true)}
-        >
-          Upload new video
-        </button>
+
+        <Dialog>
+          <DialogTrigger className="">
+            <Button
+            // className="ml-2 rounded-md bg-blue-500 px-5 py-2 font-bold text-white"
+            // onClick={() => setShowpopup(true)}
+            >
+              Upload new video
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Please fill out details</DialogTitle>
+            </DialogHeader>
+            <Select>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select Editor" />
+              </SelectTrigger>
+              <SelectContent>
+                {editors?.map((editor) => (
+                  <SelectItem value={editor.id} key={editor.id}>
+                    {editor.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Input id="picture" type="file" />
+
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant={"outline"}
+                  className={cn(
+                    "w-[280px] justify-start text-left font-normal",
+                    !date && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {date ? format(date, "PPP") : <span>Pick a date</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0">
+                <Calendar
+                  mode="single"
+                  selected={date}
+                  onSelect={setDate}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+            <Button onClick={() => void handleGetUrl()}>Upload</Button>
+          </DialogContent>
+        </Dialog>
       </div>
 
       <table className="my-3 w-full table-auto p-2">
@@ -115,7 +190,7 @@ const Upload = () => {
         </tbody>
       </table>
 
-      {showpopup && (
+      {/* {showpopup && (
         <div className="fixed inset-0 z-10 overflow-y-auto">
           <div className="z-20 flex min-h-screen flex-col items-center justify-center ">
             <div className="z-50 flex w-96 flex-col gap-y-5 rounded-lg bg-gray-200 p-10 shadow-lg">
@@ -160,7 +235,7 @@ const Upload = () => {
             </div>
           </div>
         </div>
-      )}
+      )} */}
     </div>
   );
 };

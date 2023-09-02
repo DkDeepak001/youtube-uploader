@@ -125,7 +125,7 @@ export const uploadRouter = createTRPCRouter({
       z.object({
         editorId: z.string(),
         videoUrl: z.string(),
-        dueDate: z.string(),
+        dueDate: z.date(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -135,7 +135,7 @@ export const uploadRouter = createTRPCRouter({
           ownerId: ctx.session.user.id,
           editorId: input.editorId,
           videoUrl: input.videoUrl,
-          dueDate: new Date(input.dueDate),
+          dueDate: input.dueDate,
           rework: {
             create: {
               videoUrl: input.videoUrl,
