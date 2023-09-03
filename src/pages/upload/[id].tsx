@@ -1,7 +1,16 @@
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import React from "react";
+import toast from "react-hot-toast";
 import { Badge } from "~/components/badge";
 import { Button } from "~/components/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "~/components/dialog";
+import { Input } from "~/components/input";
 import {
   Table,
   TableBody,
@@ -13,6 +22,18 @@ import {
 import { api } from "~/utils/api";
 
 const VideoStatus = () => {
+  const [title, setTitle] = React.useState("");
+  const [description, setDescription] = React.useState("");
+  const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event?.target?.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+    }
+  };
+  const { data: userData } = useSession();
+
   const { id } = useRouter().query;
   const { data: video } = api.upload.getQueueStatus.useQuery(
     { id: id as string },
@@ -20,7 +41,52 @@ const VideoStatus = () => {
       enabled: !!id,
     }
   );
-  const { mutate: changeStatus } = api.upload.changeStatus.useMutation();
+  const [isOpen, setIsOpen] = React.useState(false);
+  const context = api.useContext();
+  const { mutateAsync: changeStatus } = api.upload.changeStatus.useMutation({
+    onSuccess: async () => {
+      await context?.upload.getQueueStatus.invalidate();
+    },
+  });
+
+  const handleChangeStatus = async (
+    id: string,
+    status: "EDITING" | "READY" | "REWORK" | "APPROVED" | "PUBLISHED"
+  ) => {
+    try {
+      await toast.promise(
+        changeStatus({ id, status }),
+        {
+          loading: "Changing Status",
+          success: "Status Changed",
+          error: "Error while changing status",
+        },
+        {
+          style: {
+            minWidth: "250px",
+          },
+        }
+      );
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const handleUpload = async () => {
+    if (!selectedFile) return toast.error("Please select a file");
+    if (!title) return toast.error("Please enter title");
+    if (!description) return toast.error("Please enter description");
+
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+    formData.append("title", title);
+    formData.append("description", description);
+
+    await fetch(`/api/upload?userid=${userData?.user.id}`, {
+      method: "POST",
+      body: formData,
+    });
+  };
 
   return (
     <div className="felx flex-col">
@@ -104,7 +170,7 @@ const VideoStatus = () => {
                     <Button
                       className=" bg-green-500 px-5 py-2 text-white hover:bg-green-700"
                       onClick={() =>
-                        changeStatus({ id: video.id, status: "APPROVED" })
+                        void handleChangeStatus(video.id, "APPROVED")
                       }
                     >
                       Approve
@@ -119,9 +185,9 @@ const VideoStatus = () => {
                   {index === video.rework.length - 1 &&
                   video.status !== "REWORK" ? (
                     <Button
-                      variant="secondary"
+                      variant="default"
                       onClick={() =>
-                        changeStatus({ id: video.id, status: "REWORK" })
+                        void handleChangeStatus(video.id, "REWORK")
                       }
                     >
                       Ask For Rework
@@ -137,76 +203,43 @@ const VideoStatus = () => {
           )}
         </TableBody>
       </Table>
+      {video?.status === "APPROVED" && (
+        <div className="mt-5 flex flex-row justify-end gap-x-5">
+          <Button
+            className="bg-green-500  font-bold text-white hover:bg-green-700"
+            onClick={() => setIsOpen(true)}
+          >
+            Publish
+          </Button>
+        </div>
+      )}
 
-      {/* <table className="my-3 w-full table-auto p-2">
-        <thead className="border-b-2 border-gray-400">
-          <tr className="bg-slate-400 p-2 text-left">
-            <th className="p-3">Id</th>
-            <th className="p-3">Edited At</th>
-            <th className="p-3">Video</th>
-            <th className="p-3">Approve</th>
-            <th className="p-3">Rework</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-gray-400 bg-gray-100 text-sm text-gray-700">
-          {video?.length === 0 ? (
-            <div className="w-full bg-white  p-5">No Vidoes </div>
-          ) : (
-            video?.rework?.map((v, index) => (
-              <tr
-                key={v.id}
-                className="cursor-pointer hover:bg-gray-200"
-                // onClick={() => void router.push(`/upload/${video.id}`)}
-              >
-                <td className="p-2">{index + 1}</td>
-
-                <td className="p-2">
-                  {" "}
-                  {new Date(v?.createdAt).toLocaleDateString()}
-                </td>
-                <td className="p-2">
-                  <button
-                    className="rounded-md bg-blue-500 px-5 py-2 text-white"
-                    onClick={() => void window.open(v?.videoUrl)}
-                  >
-                    View
-                  </button>
-                </td>
-                <td className="p-2">
-                  {index === video.rework.length - 1 &&
-                  video.status !== "APPROVED" ? (
-                    <button
-                      className="rounded-md bg-green-500 px-5 py-2 text-white"
-                      onClick={() =>
-                        changeStatus({ id: video.id, status: "APPROVED" })
-                      }
-                    >
-                      Approve
-                    </button>
-                  ) : (
-                    <div className="">___________</div>
-                  )}
-                </td>
-                <td className="p-2">
-                  {index === video.rework.length - 1 &&
-                  video.status !== "REWORK" ? (
-                    <button
-                      className="rounded-md bg-red-500 px-5 py-2 text-white"
-                      onClick={() =>
-                        changeStatus({ id: video.id, status: "REWORK" })
-                      }
-                    >
-                      Ask For Rework
-                    </button>
-                  ) : (
-                    <div className="">___________</div>
-                  )}
-                </td>
-              </tr>
-            ))
-          )}
-        </tbody>
-      </table> */}
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Please fill details To Publish Video</DialogTitle>
+          </DialogHeader>
+          <Input
+            className="w-full"
+            placeholder="Enter Title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+          <Input
+            className=" w-full"
+            placeholder="Enter Description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
+          <Input type="file" onChange={handleFileChange} />
+          <Button
+            className="bg-green-500  font-bold text-white hover:bg-green-700"
+            onClick={() => void handleUpload()}
+          >
+            Publish
+          </Button>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

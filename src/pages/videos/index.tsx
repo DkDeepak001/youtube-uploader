@@ -1,8 +1,24 @@
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/router";
 import React from "react";
 import toast from "react-hot-toast";
+import { Badge } from "~/components/badge";
+import { Button } from "~/components/button";
+import { Input } from "~/components/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "~/components/tabel";
 import { api } from "~/utils/api";
 
 const Videos = () => {
+  const router = useRouter();
+  const { status } = useSession();
+  if (status === "unauthenticated") router.replace("/");
   const { data: videos } = api.upload.videosToEdit.useQuery();
 
   const { mutateAsync: getUrl } = api.upload.createPresignedUrl.useMutation();
@@ -55,70 +71,73 @@ const Videos = () => {
 
   return (
     <div>
-      <table className="my-3 w-full table-auto p-2">
-        <thead className="border-b-2 border-gray-400">
-          <tr className="bg-slate-400 p-2 text-left">
-            <th className="p-3">Id</th>
-            <th className="p-3">Editor</th>
-            <th className="p-3">Status</th>
-            <th className="p-3">DueDate</th>
-            <th className="p-3">Video</th>
-            <th className="p-3">last Edit</th>
-            <th className="p-3">Upload</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-gray-400 bg-gray-100 text-sm text-gray-700">
+      <h2 className="text-2xl font-medium text-foreground">Videos to edit</h2>
+      <Table className="mt-5">
+        {/* <TableCaption>A list of your recent invoices.</TableCaption> */}
+        <TableHeader>
+          <TableRow>
+            <TableHead className="p-3">Id</TableHead>
+            <TableHead className="p-3">Editor</TableHead>
+            <TableHead className="p-3">Status</TableHead>
+            <TableHead className="p-3">DueDate</TableHead>
+            <TableHead className="p-3">Video</TableHead>
+            <TableHead className="p-3">last Edit</TableHead>
+            <TableHead className="p-3">Upload</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {videos?.length === 0 ? (
-            <div className="w-full bg-white  p-5">No Vidoes</div>
+            <TableCell>No Vidoes</TableCell>
           ) : (
             videos?.map((video, index) => (
-              <tr key={video.id} className="cursor-pointer hover:bg-gray-200">
-                <td className="p-2">{index + 1}</td>
-
-                <td className="p-2">{video.ownerId}</td>
-                <td className="p-2">{video.status}</td>
-                <td className="p-2">
+              <TableRow key={video.id} className="hover:bg-gray-200">
+                <TableCell>{index + 1}</TableCell>
+                <TableCell>{video.ownerId}</TableCell>
+                <TableCell>{video.status}</TableCell>
+                <TableCell>
                   {new Date(video.dueDate).toLocaleDateString()}
-                </td>
-                <td className="p-2">
-                  <button
-                    className="rounded-md bg-blue-500 px-5 py-2 text-white"
+                </TableCell>
+                <TableCell>
+                  <Button
+                    className="bg-blue-500 font-bold text-white hover:bg-blue-700"
                     onClick={() => void window.open(video?.videoUrl)}
                   >
-                    open
-                  </button>
-                </td>
+                    View
+                  </Button>
+                </TableCell>
                 {video.rework.length >= 1 ? (
-                  <td className="p-2">
-                    <button
-                      className="rounded-md bg-blue-500 px-5 py-2 text-white"
+                  <TableCell>
+                    <Button
+                      className="bg-blue-500 font-bold text-white hover:bg-blue-700"
                       onClick={() =>
                         void window.open(video?.rework?.[0]?.videoUrl)
                       }
                     >
-                      open
-                    </button>
-                  </td>
+                      View
+                    </Button>
+                  </TableCell>
                 ) : (
-                  <td className="p-2">Url not found</td>
+                  <TableCell>
+                    <Badge>Url not found</Badge>
+                  </TableCell>
                 )}
                 {video.status === "EDITING" || video.status === "REWORK" ? (
-                  <td className="p-2">
-                    <input
+                  <TableCell>
+                    <Input
                       type="file"
                       onChange={(e) =>
                         void handleFileChange(e, video.videoUrl, video.id)
                       }
                     />
-                  </td>
+                  </TableCell>
                 ) : (
-                  <td className="p-2">Waiting for approval</td>
+                  <TableCell>Waiting for approval</TableCell>
                 )}
-              </tr>
+              </TableRow>
             ))
           )}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
     </div>
   );
 };

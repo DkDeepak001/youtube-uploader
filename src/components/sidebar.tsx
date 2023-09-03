@@ -121,14 +121,13 @@ const Sidebar = () => {
           </div>
         </div>
       ) : (
-        <>
-          <Button
-            className="rounded-md bg-white px-3 py-1 text-black"
-            onClick={() => void signIn("google")}
-          >
-            Login
-          </Button>
-        </>
+        <Button
+          className="mx-10 mb-6"
+          variant="outline"
+          onClick={() => void signIn("google")}
+        >
+          Login
+        </Button>
       )}
     </div>
   );

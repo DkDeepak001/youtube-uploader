@@ -1,5 +1,14 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { Input } from "~/components/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "~/components/tabel";
 import { api } from "~/utils/api";
 
 const Editors = () => {
@@ -20,52 +29,57 @@ const Editors = () => {
   };
   return (
     <div>
-      <input
+      <Input
+        placeholder="Search"
+        onChange={(e) => setQ(e.target.value)}
+        value={q}
+      />
+      {/* <input
         type="text"
         className="rounded-md border-2 border-gray-400 p-2"
         placeholder="Search"
         onChange={(e) => setQ(e.target.value)}
         value={q}
-      />
-      <table className="my-3 w-full table-auto p-2">
-        <thead className="border-b-2 border-gray-400">
-          <tr className="bg-slate-400 p-2 text-left">
-            <th className="p-3">Id</th>
-            <th className="p-3">Profile</th>
-            <th className="p-3">Name</th>
-            <th className="p-3">Email</th>
-            <th className="p-3">Action</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-gray-400 bg-gray-100 text-sm text-gray-700">
+      /> */}
+      <Table className="mt-5">
+        <TableHeader>
+          <TableRow>
+            <TableHead className="p-3">Id</TableHead>
+            <TableHead className="p-3">Profile</TableHead>
+            <TableHead className="p-3">Name</TableHead>
+            <TableHead className="p-3">Email</TableHead>
+            <TableHead className="p-3">Action</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {editors?.length === 0 ? (
-            <div className="w-full bg-white  p-5">No editors found</div>
+            <TableCell>No editors found</TableCell>
           ) : (
             editors?.map((editor, index) => (
-              <tr key={editor.id} className="hover:bg-gray-200">
-                <td className="p-2">{index + 1}</td>
-                <td className="p-2">
+              <TableRow key={editor.id} className="hover:bg-gray-200">
+                <TableCell>{index + 1}</TableCell>
+                <TableCell>
                   <img
                     src={editor.image}
                     alt="profile"
                     className="h-10 w-10 rounded-full"
                   />
-                </td>
-                <td className="p-2">{editor.name}</td>
-                <td className="p-2">{editor.email}</td>
-                <td className="p-2">
+                </TableCell>
+                <TableCell>{editor.name}</TableCell>
+                <TableCell>{editor.email}</TableCell>
+                <TableCell>
                   <button
                     className="rounded-md bg-green-500 px-5 py-2 text-white"
                     onClick={() => void handleAddEditor(editor.id)}
                   >
                     Add
                   </button>
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ))
           )}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
     </div>
   );
 };

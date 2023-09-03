@@ -22,8 +22,8 @@ export const OwnerSideBar = [
     name: "Editors",
     link: "/editors",
   },
-  {
-    name: "channel",
-    link: "/channel",
-  },
+  // {
+  //   name: "channel",
+  //   link: "/channel",
+  // },
 ];

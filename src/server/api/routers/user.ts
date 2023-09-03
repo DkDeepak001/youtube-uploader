@@ -9,6 +9,7 @@ export const userRouter = createTRPCRouter({
       },
       select: {
         yt_expiry_date: true,
+        yt_access_token: true,
         role: true,
       },
     });

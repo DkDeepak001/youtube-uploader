@@ -92,7 +92,8 @@ const Upload = () => {
       const videoRes = await createVideo({
         editorId: selectedEditor!,
         dueDate: date,
-        videoUrl: data.url,
+
+        videoUrl: data.url.split("?")[0],
       });
       if (!videoRes?.id) return;
       toast.success("Video uploaded successfully");
