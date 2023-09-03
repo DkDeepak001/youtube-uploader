@@ -6,7 +6,6 @@ import { api } from "~/utils/api";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -32,14 +31,22 @@ import {
   PopoverTrigger,
 } from "../../components/popover";
 import { Input } from "~/components/input";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../../components/tabel";
 
 const Upload = () => {
   const context = api.useContext();
   const router = useRouter();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [selectedEditor, setSelectedEditor] = useState<string>("");
+  const [selectedEditor, setSelectedEditor] = useState<string>();
   const [date, setDate] = React.useState<Date>();
-  const [showpopup, setShowpopup] = useState<boolean>(false);
 
   const { data: editors } = api.user.getEditors.useQuery();
   const { mutateAsync: getUrl } = api.upload.createPresignedUrl.useMutation();
@@ -104,19 +111,17 @@ const Upload = () => {
 
         <Dialog>
           <DialogTrigger className="">
-            <Button
-            // className="ml-2 rounded-md bg-blue-500 px-5 py-2 font-bold text-white"
-            // onClick={() => setShowpopup(true)}
-            >
-              Upload new video
-            </Button>
+            <Button>Upload new video</Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Please fill out details</DialogTitle>
             </DialogHeader>
-            <Select>
-              <SelectTrigger className="w-full">
+            <Select
+              onValueChange={(value) => setSelectedEditor(value)}
+              value={selectedEditor}
+            >
+              <SelectTrigger className="m-auto w-3/5">
                 <SelectValue placeholder="Select Editor" />
               </SelectTrigger>
               <SelectContent>
@@ -127,14 +132,19 @@ const Upload = () => {
                 ))}
               </SelectContent>
             </Select>
-            <Input id="picture" type="file" />
+            <Input
+              id="picture"
+              type="file"
+              className="m-auto w-3/5"
+              onChange={handleFileChange}
+            />
 
             <Popover>
               <PopoverTrigger asChild>
                 <Button
                   variant={"outline"}
                   className={cn(
-                    "w-[280px] justify-start text-left font-normal",
+                    "m-auto w-[280px] justify-start text-left font-normal",
                     !date && "text-muted-foreground"
                   )}
                 >
@@ -151,12 +161,60 @@ const Upload = () => {
                 />
               </PopoverContent>
             </Popover>
-            <Button onClick={() => void handleGetUrl()}>Upload</Button>
+            <Button
+              onClick={() => void handleGetUrl()}
+              variant="outline"
+              className="m-auto w-3/5"
+            >
+              Upload
+            </Button>
           </DialogContent>
         </Dialog>
       </div>
 
-      <table className="my-3 w-full table-auto p-2">
+      <Table className="mt-5">
+        {/* <TableCaption>A list of your recent invoices.</TableCaption> */}
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-[100px]">Id</TableHead>
+            <TableHead>Editor</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>DueDate</TableHead>
+            <TableHead>Reworks</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {videoQueue?.length === 0 ? (
+            <TableRow>
+              <TableCell className="font-medium">No Vidoes</TableCell>
+            </TableRow>
+          ) : (
+            videoQueue?.map((video, index) => (
+              <TableRow
+                key={video.id}
+                onClick={() => void router.push(`/upload/${video.id}`)}
+              >
+                <TableCell>{index + 1}</TableCell>
+
+                <TableCell>{video.editor.name}</TableCell>
+                <TableCell>{video.status}</TableCell>
+                <TableCell>
+                  {new Date(video.dueDate).toLocaleDateString()}
+                </TableCell>
+                <TableCell>{video._count?.rework} Reworked</TableCell>
+              </TableRow>
+            ))
+          )}
+          {/* <TableRow>
+            <TableCell className="font-medium">INV001</TableCell>
+            <TableCell>Paid</TableCell>
+            <TableCell>Credit Card</TableCell>
+            <TableCell className="text-right">$250.00</TableCell>
+          </TableRow> */}
+        </TableBody>
+      </Table>
+
+      {/* <table className="my-3 w-full table-auto p-2">
         <thead className="border-b-2 border-gray-400">
           <tr className="bg-slate-400 p-2 text-left">
             <th className="p-3">Id</th>
@@ -188,7 +246,7 @@ const Upload = () => {
             ))
           )}
         </tbody>
-      </table>
+      </table> */}
 
       {/* {showpopup && (
         <div className="fixed inset-0 z-10 overflow-y-auto">

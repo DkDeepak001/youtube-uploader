@@ -54,13 +54,13 @@ const Header = () => {
   };
   if (isLoading)
     return (
-      <div className="flex flex-row justify-between border-b bg-foreground px-5 py-3">
+      <div className="flex flex-row justify-between bg-foreground px-5 py-3">
         <h1 className="ml-3 text-2xl font-bold text-white">Youtub uploader</h1>
         <div> Loading...</div>
       </div>
     );
   return (
-    <div className="flex flex-row justify-between border-b bg-foreground px-5 py-3">
+    <div className="flex flex-row justify-between  bg-foreground px-5 py-3">
       <h1 className="ml-3 text-2xl font-bold text-white">Youtub uploader</h1>
       {status === "authenticated" ? (
         <div className="flex flex-row items-center justify-center gap-x-5">
