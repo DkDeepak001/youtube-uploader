@@ -14,7 +14,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
   return (
     <SessionProvider session={session}>
       <Toaster />
-      <Header />
+      {/* <Header /> */}
       <div className="flex flex-row ">
         <Sidebar />
         <div className="w-10/12  p-5">
