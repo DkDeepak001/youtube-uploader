@@ -29,7 +29,11 @@ export default async function handler(
       part: ["snippet", "status"],
       requestBody: {
         snippet: {
+          //eslint-disable-next-line
+          //@ts-ignore
           title: fields?.title[0]!,
+          //eslint-disable-next-line
+          //@ts-ignore
           description: fields?.description[0]!,
         },
         status: {
@@ -37,6 +41,8 @@ export default async function handler(
         },
       },
       media: {
+        //eslint-disable-next-line
+        //@ts-ignore
         body: fs.createReadStream(files.file[0].filepath),
       },
     });
