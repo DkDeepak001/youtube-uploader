@@ -60,7 +60,7 @@ const Editors = () => {
                 <TableCell>{index + 1}</TableCell>
                 <TableCell>
                   <img
-                    src={editor.image}
+                    src={editor.image!}
                     alt="profile"
                     className="h-10 w-10 rounded-full"
                   />

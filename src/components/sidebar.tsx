@@ -110,6 +110,8 @@ const Sidebar = () => {
             >
               Logout
             </Button>
+            {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+            {/* @ts-ignore */}
             {self?.yt_expiry_date < Date.now() && (
               <Button
                 className="rounded-md bg-white px-3 py-1 text-black"

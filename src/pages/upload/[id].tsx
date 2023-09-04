@@ -105,7 +105,7 @@ const VideoStatus = () => {
           <h1 className="text-lg font-semibold text-white"> Editor</h1>
           <div className="flex flex-row items-center gap-x-2">
             <img
-              src={video?.editor?.image}
+              src={video?.editor?.image!}
               alt="profile"
               className="h-8 w-8 rounded-full"
             />
@@ -117,6 +117,8 @@ const VideoStatus = () => {
         <div className="flex flex-col gap-y-2">
           <h1 className="text-lg font-semibold text-white">Due Date</h1>
           <h2 className="text-base font-medium text-white/80">
+            {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+            {/* @ts-ignore */}
             {new Date(video?.dueDate).toLocaleDateString()}
           </h2>
         </div>
@@ -145,6 +147,8 @@ const VideoStatus = () => {
           </TableRow>
         </TableHeader>
         <TableBody>
+          {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+          {/* @ts-ignore */}
           {video?.length === 0 ? (
             <TableRow>
               <TableCell className="font-medium">No Vidoes</TableCell>

@@ -10,7 +10,7 @@ export default function ChannelDetail() {
       <div className="flex flex-row items-center  gap-x-3 py-2">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={channelData?.channels?.[0]?.snippet?.thumbnails?.default?.url}
+          src={channelData?.channels?.[0]?.snippet?.thumbnails?.default?.url!}
           className="h-20 w-20 rounded-full"
           alt=""
         />
@@ -28,10 +28,10 @@ export default function ChannelDetail() {
         </div>
       </div>
       <div className="flex flex-row flex-wrap  gap-x-5  gap-y-10">
-        {channelData?.videos?.map((video) => (
-          <Card className="w-1/5">
+        {channelData?.videos?.map((video, i) => (
+          <Card className="w-1/5" key={i}>
             <img
-              src={video?.snippet?.thumbnails?.high?.url}
+              src={video?.snippet?.thumbnails?.high?.url!}
               className=" m-auto w-10/12 rounded-3xl"
               alt=""
             />

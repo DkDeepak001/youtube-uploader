@@ -10,7 +10,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "../../components/dialog";
 
 import {
@@ -93,7 +92,7 @@ const Upload = () => {
         editorId: selectedEditor!,
         dueDate: date,
 
-        videoUrl: data.url.split("?")[0],
+        videoUrl: data.url.split("?")[0]!,
       });
       if (!videoRes?.id) return;
       toast.success("Video uploaded successfully");

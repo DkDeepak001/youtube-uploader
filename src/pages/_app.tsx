@@ -3,7 +3,6 @@ import { SessionProvider } from "next-auth/react";
 import { type AppType } from "next/app";
 import { api } from "~/utils/api";
 import "~/styles/globals.css";
-import Header from "~/components/header";
 import Sidebar from "~/components/sidebar";
 import { Toaster } from "react-hot-toast";
 

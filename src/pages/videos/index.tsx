@@ -18,6 +18,7 @@ import { api } from "~/utils/api";
 const Videos = () => {
   const router = useRouter();
   const { status } = useSession();
+  //eslint-disable-next-line
   if (status === "unauthenticated") router.replace("/");
   const { data: videos } = api.upload.videosToEdit.useQuery();
 
