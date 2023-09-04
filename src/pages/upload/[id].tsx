@@ -23,6 +23,7 @@ import { api } from "~/utils/api";
 
 const VideoStatus = () => {
   const [title, setTitle] = React.useState("");
+
   const [description, setDescription] = React.useState("");
   const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
 
