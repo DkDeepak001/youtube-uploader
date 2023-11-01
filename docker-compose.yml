@@ -1,0 +1,16 @@
+version: "3"
+services:
+  main_app:
+    build:
+      context: ./
+      dockerfile: Dockerfile_main_app
+    ports:
+      - "3000:3000"
+
+  storage_servie:
+    build:
+      context: ./
+      dockerfile: Dockerfile_s3
+
+    ports:
+      - "9000:9000"

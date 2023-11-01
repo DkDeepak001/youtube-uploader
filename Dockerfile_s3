@@ -1,0 +1,15 @@
+FROM node:16
+
+WORKDIR /usr/src/app
+
+COPY package*.json ./
+COPY s3.js ./
+COPY cors.xml ./
+
+
+RUN yarn install
+
+
+CMD [ "node","s3.js" ]
+
+EXPOSE 9000
