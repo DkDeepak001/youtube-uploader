@@ -1,4 +1,5 @@
-import { useSession } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
+import { Button } from "~/components/button";
 import { api } from "~/utils/api";
 
 export default function Home() {
@@ -9,7 +10,19 @@ export default function Home() {
       enabled: !!session?.user?.email,
     }
   );
-  if (!session?.user?.email) return <div>Not logged in</div>;
+  if (!session?.user?.email)
+    return (
+      <div>
+        Not logged in{" "}
+        <Button
+          className="mx-10 mb-6"
+          variant="outline"
+          onClick={() => void signIn("google")}
+        >
+          Login
+        </Button>
+      </div>
+    );
   if (isLoading) return <div>Loading...</div>;
   return (
     <div>
