@@ -6,6 +6,7 @@ import {
 import { oAuth2Client, youtube } from "../utils";
 
 export const youtubeRouter = createTRPCRouter({
+  // Generate a URL for YouTube OAuth2 authorization (Public Mutation)
   genUrl: publicProcedure.mutation(({ ctx }) => {
     return oAuth2Client.generateAuthUrl({
       access_type: "offline",
@@ -17,18 +18,25 @@ export const youtubeRouter = createTRPCRouter({
       state: `${ctx.session?.user.id}`,
     });
   }),
+
+  // Get channel information for the authenticated user (Protected Query)
   getChannel: protectedProcedure.query(async ({ ctx }) => {
     try {
+      // Retrieve user information
       const user = await ctx.prisma.user.findUnique({
         where: {
           id: ctx?.session?.user.id,
         },
       });
+
+      // Set OAuth2 credentials for YouTube API
       oAuth2Client.setCredentials({
         access_token: user?.yt_access_token,
         refresh_token: user?.yt_refresh_token,
         expiry_date: user?.yt_expiry_date,
       });
+
+      // Retrieve channel information
       const channels = await youtube.channels.list({
         part: [
           "snippet",
@@ -44,6 +52,7 @@ export const youtubeRouter = createTRPCRouter({
         mine: true,
       });
 
+      // Retrieve videos for the authenticated user
       const videos = await youtube.search.list({
         part: ["snippet"],
         forMine: true,

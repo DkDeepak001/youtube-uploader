@@ -1,141 +1,149 @@
+// This section defines the Prisma generator configuration
 generator client {
   provider = "prisma-client-js"
   previewFeatures = ["filteredRelationCount", "fullTextSearch", "fullTextIndex"]
 }
 
+// This section defines the database configuration
 datasource db {
   provider = "mongodb"
-  url      = env("DATABASE_URL")
-  
+  url      = env("DATABASE_URL") // Database connection URL
 }
 
+// This section defines the 'Account' data model
 model Account {
   id                String  @id @default(auto()) @map("_id") @db.ObjectId
-  userId            String @db.ObjectId
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String? // @db.Text
-  access_token      String? // @db.Text
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String? // @db.Text
-  session_state     String?
+  userId            String @db.ObjectId // User ID associated with this account
+  type              String // Type of account
+  provider          String // Account provider
+  providerAccountId String // Account provider's unique identifier
+  refresh_token     String? // Optional refresh token for this account
+  access_token      String? // Optional access token for this account
+  expires_at        Int?    // Expiration timestamp for the tokens
+  token_type        String? // Type of token
+  scope             String? // Scope of access
+  id_token          String? // ID token associated with this account
+  session_state     String? // Session state
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([provider, providerAccountId])
+  @@unique([provider, providerAccountId]) // Unique constraint for provider and providerAccountId
 }
 
+// This section defines the 'Session' data model
 model Session {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  sessionToken String   @unique
-  userId       String @db.ObjectId
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionToken String   @unique // Unique session token
+  userId       String @db.ObjectId // User ID associated with this session
+  expires      DateTime // Expiration date and time
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade) // Relation to user
+
 }
 
+// This section defines an enumeration for user roles
 enum Role {
-  EDITOR
-  OWNER
+  EDITOR // Editor role
+  OWNER  // Owner role
 }
 
+// This section defines the 'User' data model
 model User {
   id            String    @id @default(auto()) @map("_id") @db.ObjectId
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
+  name          String?   // User's name
+  email         String?   @unique // User's email (unique)
+  emailVerified DateTime?  // Email verification timestamp
+  image         String?   // User's image URL
 
-  role Role @default(EDITOR)
+  role Role @default(EDITOR) // Default user role
 
-  yt_access_token  String?
-  yt_refresh_token String?
-  yt_expiry_date   Int?
+  yt_access_token  String? // YouTube access token
+  yt_refresh_token String? // YouTube refresh token
+  yt_expiry_date   Int?    // YouTube token expiration date
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) // Creation timestamp
+  updatedAt DateTime @updatedAt // Last update timestamp
 
-  channelIDs String[]  @db.ObjectId
-  channel    Channel[] @relation(fields: [channelIDs], references: [id])
-  accounts   Account[]
-  sessions   Session[]
-  videos     VideoQueue[]
+  channelIDs String[]  @db.ObjectId // IDs of associated channels
+  channel    Channel[] @relation(fields: [channelIDs], references: [id]) // Relation to channels
+  accounts   Account[] // Associated accounts
+  sessions   Session[] // Associated sessions
+  videos     VideoQueue[] // Associated video queues
 
+  // Relations to editing and editors
+  edittingChannels String[]  @db.ObjectId // IDs of channels being edited
+  editting        Editors[] @relation(name: "edittingChannel", fields: [edittingChannels], references: [id])
 
-  edittingChannels String[]  @db.ObjectId
-  editting        Editors[] @relation(name: "edittingChannel",fields: [edittingChannels], references: [id])
+  editorsIDs String[]  @db.ObjectId // IDs of editors
+  editors    Editors[] @relation(name: "editors", fields: [editorsIDs], references: [id])
 
-  editorsIDs String[]  @db.ObjectId
-  editors    Editors[] @relation(name: "editors",fields: [editorsIDs], references: [id])
-
-  @@index([name, email])
+  @@index([name, email]) // Index for name and email fields
 }
 
+// This section defines the 'VerificationToken' data model
 model VerificationToken {
   id      String   @id @default(auto()) @map("_id") @db.ObjectId
-  token   String   @unique
-  expires DateTime
+  token   String   @unique // Unique verification token
+  expires DateTime // Expiration date and time
 }
 
+// This section defines the 'Channel' data model
 model Channel {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  name      String
-  userIDs   String[] @db.ObjectId
-  user      User[]   @relation(fields: [userIDs], references: [id])
+  createdAt DateTime @default(now()) // Creation timestamp
+  updatedAt DateTime @updatedAt // Last update timestamp
+  name      String   // Channel name
+  userIDs   String[] @db.ObjectId // IDs of users associated with this channel
+  user      User[]   @relation(fields: [userIDs], references: [id]) // Relation to users
 }
 
+// This section defines the 'Editors' data model
 model Editors {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) // Creation timestamp
+  updatedAt DateTime @updatedAt // Last update timestamp
 
-  ownerIds String[] @db.ObjectId
-  owner    User[]   @relation(name:"edittingChannel",fields: [ownerIds], references: [id])
+  ownerIds String[] @db.ObjectId // IDs of owners
+  owner    User[]   @relation(name: "edittingChannel", fields: [ownerIds], references: [id]) // Relation to owners
 
-  editorsIDs   String[] @db.ObjectId
-  editors      User[]   @relation(name:"editors",fields: [editorsIDs], references: [id])
+  editorsIDs   String[] @db.ObjectId // IDs of editors
+  editors      User[]   @relation(name: "editors", fields: [editorsIDs], references: [id]) // Relation to editors
 }
 
+// This section defines an enumeration for video statuses
 enum VideoStatus {
-  EDITING
-  REWORK
-  READY
-  APPROVED
-  PUBLISHED
+  EDITING   // Video is being edited
+  REWORK    // Video needs rework
+  READY     // Video is ready
+  APPROVED  // Video is approved
+  PUBLISHED // Video is published
 }
 
+// This section defines the 'VideoQueue' data model
 model VideoQueue {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  ownerId  String 
-  editorId  String @db.ObjectId
-  editor    User    @relation(fields: [editorId], references: [id])
-  status    VideoStatus @default(EDITING)
+  id        String      @id @default(auto()) @map("_id") @db.ObjectId
+  ownerId   String      // Owner ID of the video
+  editorId  String      @db.ObjectId // Editor ID of the video
+  editor    User        @relation(fields: [editorId], references: [id]) // Relation to editor
+  status    VideoStatus @default(EDITING) // Default video status is 'EDITING'
 
-  videoUrl  String 
+  videoUrl  String   // Video URL
 
+  dueDate   DateTime // Due date for the video
+  createdAt DateTime @default(now()) // Creation timestamp
+  updatedAt DateTime @updatedAt // Last update timestamp
 
-  dueDate   DateTime
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  rework    QueueLog[] // Logs related to rework
 
-  rework   QueueLog[] 
-
-  @@index([ownerId, editorId])
+  @@index([ownerId, editorId]) // Index for ownerId and editorId
 }
 
-
-model QueueLog{
+// This section defines the 'QueueLog' data model
+model QueueLog {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  videoUrl  String
-  
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  videoUrl  String   // Video URL
 
+  createdAt DateTime @default(now()) // Creation timestamp
+  updatedAt DateTime @updatedAt // Last update timestamp
 
-  videoId   String @db.ObjectId
-  video     VideoQueue @relation(fields: [videoId], references: [id])
-
+  videoId   String   @db.ObjectId // Video ID associated with this log
+  video     VideoQueue @relation(fields: [videoId], references: [id]) // Relation to the associated video
 }

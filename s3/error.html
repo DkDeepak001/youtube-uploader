@@ -1,10 +1,77 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-  </head>
-  <body></body>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Page Not Found</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .error-container {
+            text-align: center;
+            animation: bounce 2s infinite;
+        }
+
+        .error-title {
+            font-size: 72px;
+            color: #e74c3c;
+        }
+
+        .error-message {
+            font-size: 24px;
+            color: #333;
+            margin-top: 10px;
+        }
+
+        .error-emoji {
+            font-size: 48px;
+        }
+
+        .error-link {
+            text-decoration: none;
+            background-color: #3498db;
+            color: #fff;
+            font-size: 18px;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+
+        .error-link:hover {
+            background-color: #2980b9;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-20px);
+            }
+            60% {
+                transform: translateY(-10px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <div class="error-title">404</div>
+        <div class="error-emoji">&#x1F622;</div> <!-- Google emoji for a sad face -->
+        <div class="error-message">Oops! Looks like you're lost in space.</div>
+        <p>We couldn't find the page you're looking for.</p>
+        <a href="/" class="error-link">Go to Homepage</a>
+    </div>
+</body>
 </html>

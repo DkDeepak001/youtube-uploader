@@ -4,6 +4,7 @@ import { s3Client } from "../utils";
 import { z } from "zod";
 
 export const uploadRouter = createTRPCRouter({
+  // Create a presigned URL for file uploads (Protected Mutation)
   createPresignedUrl: protectedProcedure
     .input(
       z.object({
@@ -33,6 +34,8 @@ export const uploadRouter = createTRPCRouter({
         console.error(err);
       }
     }),
+
+  // Get video queue for the authenticated user (Protected Query)
   getVideoQueue: protectedProcedure.query(async ({ ctx }) => {
     return await ctx.prisma.videoQueue.findMany({
       where: {
@@ -59,6 +62,8 @@ export const uploadRouter = createTRPCRouter({
       },
     });
   }),
+
+  // Get videos assigned to edit by the authenticated user (Protected Query)
   videosToEdit: protectedProcedure.query(async ({ ctx }) => {
     return await ctx.prisma.videoQueue.findMany({
       where: {
@@ -84,6 +89,8 @@ export const uploadRouter = createTRPCRouter({
       },
     });
   }),
+
+  // Get queue status by video ID (Protected Query)
   getQueueStatus: protectedProcedure
     .input(
       z.object({
@@ -120,6 +127,7 @@ export const uploadRouter = createTRPCRouter({
       });
     }),
 
+  // Create a new video record (Protected Mutation)
   createVideo: protectedProcedure
     .input(
       z.object({
@@ -144,6 +152,8 @@ export const uploadRouter = createTRPCRouter({
         },
       });
     }),
+
+  // Mark a video as edited (Protected Mutation)
   videoEdited: protectedProcedure
     .input(
       z.object({
@@ -166,6 +176,8 @@ export const uploadRouter = createTRPCRouter({
         },
       });
     }),
+
+  // Change the status of a video (Protected Mutation)
   changeStatus: protectedProcedure
     .input(
       z.object({

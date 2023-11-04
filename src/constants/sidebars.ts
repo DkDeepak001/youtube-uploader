@@ -1,4 +1,4 @@
-export const EditorSideBar = [
+const commonSidebar = [
   {
     name: "Home",
     link: "/",
@@ -9,21 +9,17 @@ export const EditorSideBar = [
   },
 ];
 
+export const EditorSideBar = [...commonSidebar];
+
 export const OwnerSideBar = [
+  ...commonSidebar,
   {
-    name: "Home",
-    link: "/",
-  },
-  {
-    name: "Videos",
+    name: "Upload",
     link: "/upload",
   },
   {
     name: "Editors",
     link: "/editors",
   },
-  // {
-  //   name: "channel",
-  //   link: "/channel",
-  // },
+  // Add other Owner-specific items here
 ];
