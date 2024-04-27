@@ -13,7 +13,7 @@ export const youtubeRouter = createTRPCRouter({
         "https://www.googleapis.com/auth/youtube.upload",
         "https://www.googleapis.com/auth/youtube",
       ],
-      redirect_uri: "http://localhost:3000/api/google/auth",
+      redirect_uri: " https://youtube-uploader-eight.vercel.app/api/google/auth",
       state: `${ctx.session?.user.id}`,
     });
   }),
