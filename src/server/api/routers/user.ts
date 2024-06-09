@@ -2,6 +2,7 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
 export const userRouter = createTRPCRouter({
+  // Get self user information (Protected Query)
   self: protectedProcedure.query(async ({ ctx }) => {
     return ctx.prisma.user.findUnique({
       where: {
@@ -15,6 +16,7 @@ export const userRouter = createTRPCRouter({
     });
   }),
 
+  // Get editors for the authenticated user (Protected Query)
   getEditors: protectedProcedure.query(async ({ ctx }) => {
     const editorsIDs = await ctx.prisma.user.findUnique({
       where: {
@@ -41,6 +43,8 @@ export const userRouter = createTRPCRouter({
     });
     return editors;
   }),
+
+  // Search for editors with a query (Protected Query)
   searchEditors: protectedProcedure
     .input(
       z.object({
@@ -67,6 +71,7 @@ export const userRouter = createTRPCRouter({
       return (await editors).filter((editor) => editor.role === "EDITOR");
     }),
 
+  // Add an editor (Protected Mutation)
   addEditor: protectedProcedure
     .input(
       z.object({
@@ -112,6 +117,8 @@ export const userRouter = createTRPCRouter({
         return null;
       }
     }),
+
+  // Remove an editor (Protected Mutation)
   removeEditor: protectedProcedure
     .input(
       z.object({
